@@ -30,7 +30,9 @@ ROOT_URLCONF: str = 'sie_mpctl_server.urls'
 TEMPLATES: list = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

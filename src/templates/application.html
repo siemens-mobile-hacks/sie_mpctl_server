@@ -1,0 +1,11 @@
+{% extends 'html5.html' %}
+{% load static %}
+
+{% block head %}
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <title>siempctl</title>
+{% endblock %}
+{% block body %}
+    <div id="content"></div>
+    <script src="{% static 'bundle.js' %}"></script>
+{% endblock %}
