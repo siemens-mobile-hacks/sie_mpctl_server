@@ -1,6 +1,9 @@
 # dirs
 __pycache__/
 /.idea/
+/dist/
+/node_modules/
 /venv/
 # files
 /src/sie_mpctl_server/secret.py
+/package*.json

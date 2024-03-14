@@ -2,6 +2,7 @@ from pathlib import Path
 from sie_mpctl_server.secret import * # noqa
 
 BASE_DIR: Path = Path(__file__).resolve().parent.parent
+ROOT_DIR: Path = BASE_DIR.parent
 
 ALLOWED_HOSTS: list = ['*']
 
@@ -68,6 +69,9 @@ TIME_ZONE: str = 'UTC'
 USE_I18N: bool = True
 USE_TZ: bool = True
 
+STATICFILES_DIRS: list = [
+    ROOT_DIR / 'dist',
+]
 STATIC_URL: str = '/static/'
 
 DEFAULT_AUTO_FIELD: str = 'django.db.models.BigAutoField'
