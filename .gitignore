@@ -1,0 +1,6 @@
+# dirs
+__pycache__/
+/.idea/
+/venv/
+# files
+/src/sie_mpctl_server/secret.py
