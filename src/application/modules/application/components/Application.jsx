@@ -1,11 +1,12 @@
 import React from 'react';
-
+import MPCtl from '@/modules/mpctl/components/MPCtl';
+import '../styles/Application.scss';
 
 const Application = () => {
     return (
-        <main>
-            <p>Hello!</p>
-        </main>
+        <div>
+            <MPCtl/>
+        </div>
     );
 };
 

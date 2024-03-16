@@ -1,0 +1,17 @@
+#MPCtl {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  > .volume {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    > p {
+      padding: 0 10px;
+    }
+  }
+  > .song {
+    font-size: 2rem;
+    text-align: center;
+  }
+}
