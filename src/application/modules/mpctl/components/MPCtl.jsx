@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useWebSocket } from '~/hooks/websocket';
 import Typography from '@mui/material/Typography';
 import IconButton from "@mui/material/IconButton";
 import AddIcon from '@mui/icons-material/Add';
@@ -10,6 +11,14 @@ import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import '../styles/MPCtl.scss';
 
 const MPCtl = () => {
+    const wsData = useWebSocket('/ws/data/', {
+        shouldReconnect: () => true,
+    });
+
+    useEffect(() => {
+        console.log('get:', wsData.lastJsonMessage);
+    }, [wsData.lastJsonMessage]);
+
     return (
         <div id="MPCtl">
             <div className="volume">

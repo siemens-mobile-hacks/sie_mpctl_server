@@ -7,6 +7,7 @@ ROOT_DIR: Path = BASE_DIR.parent
 ALLOWED_HOSTS: list = ['*']
 
 INSTALLED_APPS: list = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,7 @@ TEMPLATES: list = [
 ]
 
 WSGI_APPLICATION: str = 'sie_mpctl_server.wsgi.application'
+ASGI_APPLICATION: str = 'sie_mpctl_server.asgi.application'
 
 AUTH_PASSWORD_VALIDATORS: list = [
     {
