@@ -67,4 +67,5 @@ class Server:
         return data
 
     def send(self, data: bytes) -> None:
-        self._conn.send(data)
+        if self._conn:
+            self._conn.send(data)
