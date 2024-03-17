@@ -37,7 +37,7 @@ class Server:
             if data is None:
                 break
             elif data:
-                s = unpack('!256sBBB', data)
+                s = unpack('!256sbBB', data)
                 song: str = s[0]
                 status: int = s[1]
                 volume: int = s[2]
