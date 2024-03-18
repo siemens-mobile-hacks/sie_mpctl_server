@@ -6,7 +6,8 @@
   },
   "private": true,
   "scripts": {
-    "watch": "webpack-cli -w --mode development --config webpack/webpack.config.js"
+    "watch": "webpack-cli -w --mode development --config webpack/webpack.config.js",
+    "build-prod": "webpack-cli --mode production --config webpack/webpack.config.js --progress"
   },
   "babel": {
     "presets": [

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  build-prod:
+    image: sie_mpctl_node
+    build: docker/node
+    volumes:
+      - ./dist:/sie_mpctl/dist
+      - ./meta:/sie_mpctl/meta
+      - ./src/application:/sie_mpctl/src/application
+      - ./src/sass:/sie_mpctl/src/sass
+      - ./webpack:/sie_mpctl/webpack
+    working_dir: /sie_mpctl
+    command:  npm run build-prod

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+bash bin/build-python
+bash bin/build-node
+bash bin/build-postgres
+
+docker-compose -f node.yml run --rm build-prod
+docker-compose --env-file=.env -f docker-compose.yml -f django.yml run --rm collectstatic
+
+docker-compose --env-file=.env down --remove-orphans
+
+docker-compose --env-file=.env up -d db_sie_mpctl
+docker-compose --env-file=.env -f docker-compose.yml -f django.yml run --rm migrate
+docker-compose --env-file=.env up -d

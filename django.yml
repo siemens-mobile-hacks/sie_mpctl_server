@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  migrate:
+    image: sie_mpctl_python
+    build: docker/python
+    volumes:
+      - .:/sie_mpctl
+    working_dir: /sie_mpctl/src
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    command: python manage.py migrate
+  collectstatic:
+    image: sie_mpctl_python
+    build: docker/python
+    volumes:
+      - .:/sie_mpctl
+    working_dir: /sie_mpctl/src
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    command: python manage.py collectstatic --noinput

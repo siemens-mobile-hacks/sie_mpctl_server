@@ -1,0 +1,77 @@
+version: '3'
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+
+services:
+  db_sie_mpctl:
+    restart: always
+    image: sie_mpctl_postgres
+    build: docker/postgres
+    container_name: 'sie_mpctl_db'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  gunicorn_sie_mpctl:
+    restart: always
+    image: sie_mpctl_python
+    build: docker/python
+    container_name: 'sie_mpctl_gunicorn'
+    volumes:
+      - .:/sie_mpctl/
+    working_dir: /sie_mpctl/src
+    command: gunicorn -c gunicorn.py sie_mpctl.wsgi --env DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    depends_on:
+      - db_sie_mpctl
+  server_sie_mpctl:
+    restart: always
+    image: sie_mpctl_python
+    build: docker/python
+    container_name: 'sie_mpctl_server'
+    volumes:
+      - .:/sie_mpctl
+      - /tmp:/tmp
+    working_dir: /sie_mpctl/src
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    command: python manage.py server
+    ports:
+      - '8989:8989'
+    depends_on:
+      - gunicorn_sie_mpctl
+  daphne_sie_mpctl:
+    restart: always
+    image: sie_mpctl_python
+    build: docker/python
+    container_name: 'sie_mpctl_daphne'
+    volumes:
+      - .:/sie_mpctl
+      - /tmp:/tmp
+    working_dir: /sie_mpctl/src
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    command: daphne -b 0.0.0.0 -p 8001 --proxy-headers sie_mpctl.asgi:application
+  nginx_sie_mpctl:
+      restart: always
+      image: nginx:1.25
+      container_name: 'sie_mpctl_nginx'
+      volumes:
+        - .:/sie_mpctl
+        - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      environment:
+        - NGINX_DOMAIN_NAME=${HOST}
+        - VIRTUAL_HOST=${HOST}
+        - LETSENCRYPT_HOST=${HOST}
+        - LETSENCRYPT_EMAIL=${EMAIL}
+      command: bash -c "envsubst '$${NGINX_DOMAIN_NAME}' < /etc/nginx/conf.d/sie_mpctl.template > /etc/nginx/conf.d/sie_mpctl.conf && nginx -g 'daemon off;'"
+      depends_on:
+        - gunicorn_sie_mpctl
+#      ports:
+#        - '80:80'
+volumes:
+  pg_data:

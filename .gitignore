@@ -2,8 +2,14 @@
 __pycache__/
 /.idea/
 /dist/
+/logs/
 /node_modules/
+/staticfiles/
 /venv/
+
 # files
-/src/sie_mpctl_server/secret.py
+/docker/nginx/conf.d/sie_mpctl.conf
+/src/sie_mpctl/secret.py
+/src/sie_mpctl/settings_prod.py
+/.env
 /package*.json

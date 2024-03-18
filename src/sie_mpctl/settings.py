@@ -70,9 +70,10 @@ LANGUAGE_CODE: str = 'en-us'
 USE_I18N: bool = True
 USE_TZ: bool = True
 
+STATIC_URL: str = '/static/'
 STATICFILES_DIRS: list = [
     ROOT_DIR / 'dist',
 ]
-STATIC_URL: str = '/static/'
+STATIC_ROOT: Path = ROOT_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD: str = 'django.db.models.BigAutoField'

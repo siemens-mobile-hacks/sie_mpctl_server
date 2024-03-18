@@ -1,0 +1,43 @@
+upstream sie_mpctl_gunicorn {
+  server gunicorn_sie_mpctl:8000;
+}
+
+upstream sie_mpctl_daphne {
+  server daphne_sie_mpctl:8001;
+}
+
+server {
+  listen 80;
+  server_name ${NGINX_DOMAIN_NAME};
+  charset utf-8;
+
+  gzip on;
+  autoindex off;
+  client_max_body_size 100M;
+
+  access_log /sie_mpctl/logs/nginx-access.log;
+  error_log  /sie_mpctl/logs/nginx-error.log error;
+
+  location / {
+    proxy_pass http://sie_mpctl_gunicorn;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+  location /static/ {
+    alias /sie_mpctl/staticfiles/;
+    access_log off;
+  }
+  location /ws/ {
+    proxy_pass http://sie_mpctl_daphne;
+    proxy_http_version 1.1;
+    proxy_redirect off;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host $server_name;
+  }
+}

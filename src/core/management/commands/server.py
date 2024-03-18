@@ -1,5 +1,6 @@
 import signal
 from threading import Thread
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from proxy import ProxyServer
 from server import Server
@@ -16,8 +17,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         self._t1.start()
         self._t2.start()
-        signal.signal(signal.SIGINT, self.quit)
-        signal.signal(signal.SIGTERM, self.quit)
+        if settings.DEBUG:
+            signal.signal(signal.SIGINT, self.quit)
+            signal.signal(signal.SIGTERM, self.quit)
 
     # noinspection PyUnusedLocal
     def quit(self, signum: any, frame: any) -> None:
