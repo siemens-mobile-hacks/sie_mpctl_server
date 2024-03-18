@@ -1,0 +1,11 @@
+{
+  "name": "SieMPCtl",
+  "short_name": "SieMPCtl",
+  "display": "standalone",
+  "icons": [{
+    "src": "img/icon.png",
+    "sizes": "120x120",
+    "type": "image/png"
+  }],
+  "theme_color": "#121212"
+}

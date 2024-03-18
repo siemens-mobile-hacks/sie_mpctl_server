@@ -73,6 +73,7 @@ USE_TZ: bool = True
 STATIC_URL: str = '/static/'
 STATICFILES_DIRS: list = [
     ROOT_DIR / 'dist',
+    ROOT_DIR / 'static',
 ]
 STATIC_ROOT: Path = ROOT_DIR / 'staticfiles'
 
