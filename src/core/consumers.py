@@ -7,11 +7,8 @@ from server import Command
 class DataConsumer(JsonWebsocketConsumer):
     def connect(self) -> None:
         user: any = self.scope['user']
-        if True:
+        if user.is_authenticated:
             self.accept()
-            # while True:
-            #     await self.send_json({})
-            #     await asyncio.sleep(1)
 
     def receive(self, text_data: Optional[str] = None, bytes_data: Optional[bytes] = None, **kwargs) -> None:
         proxy_client: ProxyClient = ProxyClient()
