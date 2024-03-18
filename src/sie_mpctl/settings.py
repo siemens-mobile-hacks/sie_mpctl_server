@@ -1,5 +1,5 @@
 from pathlib import Path
-from sie_mpctl_server.secret import * # noqa
+from sie_mpctl.secret import * # noqa
 
 BASE_DIR: Path = Path(__file__).resolve().parent.parent
 ROOT_DIR: Path = BASE_DIR.parent
@@ -27,7 +27,7 @@ MIDDLEWARE: list = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF: str = 'sie_mpctl_server.urls'
+ROOT_URLCONF: str = 'sie_mpctl.urls'
 
 TEMPLATES: list = [
     {
@@ -47,8 +47,8 @@ TEMPLATES: list = [
     },
 ]
 
-WSGI_APPLICATION: str = 'sie_mpctl_server.wsgi.application'
-ASGI_APPLICATION: str = 'sie_mpctl_server.asgi.application'
+WSGI_APPLICATION: str = 'sie_mpctl.wsgi.application'
+ASGI_APPLICATION: str = 'sie_mpctl.asgi.application'
 
 AUTH_PASSWORD_VALIDATORS: list = [
     {
@@ -67,7 +67,6 @@ AUTH_PASSWORD_VALIDATORS: list = [
 
 
 LANGUAGE_CODE: str = 'en-us'
-TIME_ZONE: str = 'UTC'
 USE_I18N: bool = True
 USE_TZ: bool = True
 

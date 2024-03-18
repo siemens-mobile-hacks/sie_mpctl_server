@@ -1,6 +1,7 @@
-from sie_mpctl_server.settings import * # noqa
+from sie_mpctl.settings import * # noqa
 
 DEBUG: bool = True
+TIME_ZONE: str = 'Europe/Samara'
 
 DATABASES: dict = {
     'default': {
