@@ -1,4 +1,5 @@
 import socket
+import contextlib
 from struct import pack
 from pathlib import Path
 from server import Server
@@ -34,7 +35,8 @@ class ProxyServer(BaseProxy):
         if conn:
             recv: bytes = conn.recv(1)
             if recv:
-                self._server.send(recv)
+                with contextlib.suppress(BrokenPipeError):
+                    self._server.send(recv)
 
 
 class ProxyClient(BaseProxy):
