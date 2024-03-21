@@ -1,5 +1,4 @@
 import socket
-import contextlib
 from struct import pack
 from pathlib import Path
 from server import Server
@@ -13,7 +12,7 @@ class BaseProxy:
 
 class ProxyServer(BaseProxy):
     def __init__(self, server: Server) -> None:
-        self._exit: int = 0
+        self._exit: bool = False
         self._server: Server = server
         super(ProxyServer, self).__init__()
         self._path.unlink(missing_ok=True)
@@ -24,19 +23,18 @@ class ProxyServer(BaseProxy):
         while True:
             if self._exit:
                 break
-            self.receive()
+            try:
+                conn, addr = self._socket.accept()
+            except ConnectionAbortedError:
+                continue
+            if conn:
+                recv: bytes = conn.recv(1)
+                if recv:
+                    self._server.send(recv)
 
     def serve_stop(self) -> None:
-        self._exit = 1
+        self._exit = True
         self._socket.close()
-
-    def receive(self) -> None:
-        conn, addr = self._socket.accept()
-        if conn:
-            recv: bytes = conn.recv(1)
-            if recv:
-                with contextlib.suppress(BrokenPipeError):
-                    self._server.send(recv)
 
 
 class ProxyClient(BaseProxy):

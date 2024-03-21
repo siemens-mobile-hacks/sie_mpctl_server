@@ -1,8 +1,7 @@
 import socket
 import contextlib
 from enum import Enum
-from struct import unpack
-from typing import Optional
+from struct import pack, unpack
 
 
 class Command(Enum):
@@ -22,6 +21,7 @@ class Command(Enum):
 
 class Server:
     def __init__(self) -> None:
+        self._exit: bool = False
         self._conn: any = None
         self._socket: any = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -32,40 +32,49 @@ class Server:
         except OSError:
             return
         self._socket.listen(1)
+        self._socket.settimeout(10.0)
         while True:
-            data: Optional[bytes] = self.receive()
-            if data is None:
+            if self._exit:
                 break
-            elif data:
+            try:
+                self._conn, addr = self._socket.accept()
+            except (ConnectionError, TimeoutError) as err:
+                continue
+            self.receive()
+
+    def serve_stop(self) -> None:
+        self._exit = True
+        with contextlib.suppress(OSError):
+            self._socket.shutdown(socket.SHUT_RDWR)
+        self._socket.close()
+
+    def receive(self) -> None:
+        data: bytes = bytes()
+        while True:
+            if self._exit:
+                break
+            try:
+                recv: bytes = self._conn.recv(64)
+                self._conn.settimeout(10.0)
+                if not recv:
+                    break
+            except (ConnectionError, TimeoutError) as err:
+                break
+            if len(recv) == 1:
+                if unpack('!B', recv)[0] == 0xFF:  # ping
+                    self.send(pack("!B", 0xFF))  # pong
+                    continue
+            data += recv
+            if len(data) >= 259:
                 s = unpack('!256sbBB', data)
                 song: str = s[0]
                 status: int = s[1]
                 volume: int = s[2]
                 muted: bool = s[3]
-
-    def serve_stop(self) -> None:
-        with contextlib.suppress(OSError):
-            self._socket.shutdown(socket.SHUT_RDWR)
-        self._socket.close()
-
-    def receive(self) -> Optional[bytes]:
-        data: bytes = bytes()
-        try:
-            self._conn, addr = self._socket.accept()
-        except (ConnectionAbortedError, OSError):
-            return None
-        while True:
-            try:
-                recv: bytes = self._conn.recv(64)
-            except ConnectionResetError:
-                return bytes()
-            if not recv:
-                break
-            data += recv
-            if len(data) >= 259:
-                break
-        return data
+                data = bytes()
+                continue
 
     def send(self, data: bytes) -> None:
         if self._conn:
-            self._conn.send(data)
+            with contextlib.suppress(BrokenPipeError):
+                self._conn.send(data)
