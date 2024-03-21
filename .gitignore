@@ -8,6 +8,7 @@ __pycache__/
 /venv/
 
 # files
+.DS_Store
 /docker/nginx/conf.d/sie_mpctl.conf
 /src/sie_mpctl/secret.py
 /src/sie_mpctl/settings_prod.py
