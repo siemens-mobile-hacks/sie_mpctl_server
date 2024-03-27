@@ -17,6 +17,7 @@ class Command(Enum):
     PLAYER_VOL_UP = 0x15
     PLAYER_VOL_DOWN = 0x16
     PLAYER_REPEAT1 = 0x18
+    PING = 0xFF
 
 
 class Server:
@@ -38,7 +39,7 @@ class Server:
                 break
             try:
                 self._conn, addr = self._socket.accept()
-            except (ConnectionError, TimeoutError) as err:
+            except (ConnectionError, TimeoutError):
                 continue
             self.receive()
 
@@ -55,23 +56,20 @@ class Server:
                 break
             try:
                 recv: bytes = self._conn.recv(64)
-                self._conn.settimeout(10.0)
+                self._conn.settimeout(30.0)
                 if not recv:
                     break
-            except (ConnectionError, TimeoutError) as err:
+            except (ConnectionError, TimeoutError):
                 break
-            if len(recv) == 1:
-                if unpack('!B', recv)[0] == 0xFF:  # ping
-                    self.send(pack("!B", 0xFF))  # pong
-                    continue
             data += recv
             if len(data) >= 259:
-                s = unpack('!256sbBB', data)
+                s: tuple = unpack('!256sbBB', data[:259])
                 song: str = s[0]
                 status: int = s[1]
                 volume: int = s[2]
                 muted: bool = s[3]
-                data = bytes()
+                data = data[259:]
+                self.send(pack("!B", Command.PING.value))
                 continue
 
     def send(self, data: bytes) -> None:
