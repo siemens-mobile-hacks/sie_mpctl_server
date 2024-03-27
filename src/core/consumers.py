@@ -1,4 +1,5 @@
 from typing import Optional
+from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from proxy import ProxyClient
 from server import Command
@@ -8,6 +9,7 @@ class DataConsumer(JsonWebsocketConsumer):
     def connect(self) -> None:
         user: any = self.scope['user']
         if user.is_authenticated:
+            async_to_sync(self.channel_layer.group_add)('data', self.channel_name)
             self.accept()
 
     def receive(self, text_data: Optional[str] = None, bytes_data: Optional[bytes] = None, **kwargs) -> None:
@@ -26,3 +28,6 @@ class DataConsumer(JsonWebsocketConsumer):
             proxy_client.send(Command.PLAYER_STOP.value)
         elif text_data == 'next':
             proxy_client.send(Command.PLAYER_NEXT.value)
+
+    def send_data(self, event: dict) -> None:
+        self.send_json(event['content'])

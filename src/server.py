@@ -1,7 +1,10 @@
 import socket
+import asyncio
 import contextlib
 from enum import Enum
+from typing import Optional
 from struct import pack, unpack
+from core.ws_actions import ws_send_data
 
 
 class Command(Enum):
@@ -27,7 +30,15 @@ class Server:
         self._socket: any = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
+    @staticmethod
+    def _ws_send_data(connected: bool = True, data: Optional[dict] = None) -> None:
+        d: dict = data.copy() if data else dict()
+        d['connected'] = connected
+        asyncio.run(ws_send_data(d))
+
     def serve_forever(self) -> None:
+        loop: any = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
             self._socket.bind(('0.0.0.0', 8989))
         except OSError:
@@ -36,9 +47,12 @@ class Server:
         self._socket.settimeout(10.0)
         while True:
             if self._exit:
+                self._ws_send_data(False)
                 break
             try:
+                self._ws_send_data(False)
                 self._conn, addr = self._socket.accept()
+                self._ws_send_data(True)
             except (ConnectionError, TimeoutError):
                 continue
             self.receive()
@@ -64,15 +78,17 @@ class Server:
             data += recv
             if len(data) >= 259:
                 s: tuple = unpack('!256sbBB', data[:259])
-                song: str = s[0]
+                track: str = s[0].decode().rstrip('\0')
                 status: int = s[1]
-                volume: int = s[2]
-                muted: bool = s[3]
+                # volume: int = s[2]
+                # muted: bool = s[3]
                 data = data[259:]
                 self.send(pack("!B", Command.PING.value))
+                self._ws_send_data(data={'track': track, 'status': status})
                 continue
 
     def send(self, data: bytes) -> None:
         if self._conn:
             with contextlib.suppress(BrokenPipeError):
                 self._conn.send(data)
+
