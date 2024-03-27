@@ -10,3 +10,5 @@ DATABASES: dict = {
         'USER': 'sie_mpctl',
     }
 }
+
+CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [('127.0.0.1', 6379)]

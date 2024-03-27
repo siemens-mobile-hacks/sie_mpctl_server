@@ -78,3 +78,12 @@ STATICFILES_DIRS: list = [
 STATIC_ROOT: Path = ROOT_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD: str = 'django.db.models.BigAutoField'
+
+CHANNEL_LAYERS: dict = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [],
+        },
+    },
+}
