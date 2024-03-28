@@ -12,6 +12,11 @@ class DataConsumer(JsonWebsocketConsumer):
             async_to_sync(self.channel_layer.group_add)('data', self.channel_name)
             self.accept()
 
+    def disconnect(self, code: int) -> None:
+        user: any = self.scope['user']
+        if user.is_staff:
+            async_to_sync(self.channel_layer.group_discard)('data', self.channel_name)
+
     def receive(self, text_data: Optional[str] = None, bytes_data: Optional[bytes] = None, **kwargs) -> None:
         proxy_client: ProxyClient = ProxyClient()
         if text_data == 'vol-down':
