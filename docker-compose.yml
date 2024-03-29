@@ -48,6 +48,7 @@ services:
       - '8989:8989'
     depends_on:
       - gunicorn_sie_mpctl
+      - redis_sie_mpctl
   daphne_sie_mpctl:
     restart: always
     image: sie_mpctl_python

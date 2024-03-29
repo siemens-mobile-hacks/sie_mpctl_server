@@ -34,11 +34,9 @@ class Server:
     def _ws_send_data(connected: bool = True, data: Optional[dict] = None) -> None:
         d: dict = data.copy() if data else dict()
         d['connected'] = connected
-        asyncio.run(ws_send_data(d))
+        ws_send_data(d)
 
     def serve_forever(self) -> None:
-        loop: any = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         try:
             self._socket.bind(('0.0.0.0', 8989))
         except OSError:
