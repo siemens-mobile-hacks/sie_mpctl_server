@@ -4,13 +4,11 @@
   justify-content: center;
   width: 480px;
   max-width: 100vw;
+  padding: 0 10px;
   > .volume {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    > p {
-      padding: 0 10px;
-    }
   }
   > .track {
     padding: 10px 0;
