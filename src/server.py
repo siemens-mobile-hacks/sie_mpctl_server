@@ -75,15 +75,19 @@ class Server:
                 break
             data += recv
             if len(data) >= 259:
-                s: tuple = unpack('!256sbBB', data[:259])
-                track: str = s[0].decode().rstrip('\0')
-                status: int = s[1]
-                # volume: int = s[2]
-                # muted: bool = s[3]
-                data = data[259:]
-                self.send(pack("!B", Command.PING.value))
-                self._ws_send_data(data={'track': track, 'status': status})
-                continue
+                try:
+                    s: tuple = unpack('!256sbBB', data[:259])
+                    track: str = s[0].decode().rstrip('\0')
+                    status: int = s[1]
+                    # volume: int = s[2]
+                    # muted: bool = s[3]
+                    self.send(pack("!B", Command.PING.value))
+                    self._ws_send_data(data={'track': track, 'status': status})
+                except UnicodeDecodeError:
+                    pass
+                finally:
+                    data = data[259:]
+                    continue
 
     def send(self, data: bytes) -> None:
         if self._conn:
