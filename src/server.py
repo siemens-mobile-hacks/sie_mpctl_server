@@ -42,7 +42,7 @@ class Server:
         except OSError:
             return
         self._socket.listen(1)
-        self._socket.settimeout(10.0)
+        self._socket.settimeout(30.0)
         while True:
             if self._exit:
                 self._ws_send_data(False)
@@ -81,11 +81,11 @@ class Server:
                     status: int = s[1]
                     # volume: int = s[2]
                     # muted: bool = s[3]
-                    self.send(pack("!B", Command.PING.value))
                     self._ws_send_data(data={'track': track, 'status': status})
                 except UnicodeDecodeError:
                     pass
                 finally:
+                    self.send(pack("!B", Command.PING.value))
                     data = data[259:]
                     continue
 
