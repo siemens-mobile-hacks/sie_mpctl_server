@@ -18,7 +18,7 @@ const Track = (props) => {
 };
 
 Track.propTypes = {
-    track: PropTypes.string.isRequired,
+    track: PropTypes.string,
     status: PropTypes.number.isRequired,
 };
 
