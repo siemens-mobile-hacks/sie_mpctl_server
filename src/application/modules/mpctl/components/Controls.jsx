@@ -17,7 +17,7 @@ const Controls = ({onClick}) => {
             <IconButton size="large" color="success" onClick={onClick('play')}>
                 <PlayArrowIcon/>
             </IconButton>
-            <IconButton size="large" color="success" onClick={onClick('pause')}>
+            <IconButton size="large" color="warning" onClick={onClick('pause')}>
                 <PauseIcon/>
             </IconButton>
             <IconButton size="large" color="error" onClick={onClick('stop')}>
