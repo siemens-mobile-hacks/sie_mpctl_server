@@ -1,5 +1,4 @@
 import socket
-import asyncio
 import contextlib
 from enum import Enum
 from typing import Optional
@@ -20,6 +19,7 @@ class Command(Enum):
     PLAYER_VOL_UP = 0x15
     PLAYER_VOL_DOWN = 0x16
     PLAYER_REPEAT1 = 0x18
+    SHUTDOWN = 0xF0
     PING = 0xFF
 
 

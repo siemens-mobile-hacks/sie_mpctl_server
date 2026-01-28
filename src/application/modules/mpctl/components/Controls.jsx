@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 
 const Controls = ({onClick}) => {
     return (
@@ -28,6 +29,9 @@ const Controls = ({onClick}) => {
             </IconButton>
             <IconButton size="large" color="error" onClick={onClick('kill')}>
                 <CloseIcon/>
+            </IconButton>
+            <IconButton size="large" color="error" onClick={onClick('shutdown')}>
+                <PowerSettingsNewIcon/>
             </IconButton>
         </div>
     );

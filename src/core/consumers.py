@@ -35,6 +35,8 @@ class DataConsumer(JsonWebsocketConsumer):
             proxy_client.send(Command.PLAYER_NEXT.value)
         elif text_data == 'kill':
             proxy_client.send(Command.PLAYER_KILL.value)
+        elif text_data == 'shutdown':
+            proxy_client.send(Command.SHUTDOWN.value)
 
     def send_data(self, event: dict) -> None:
         self.send_json(event['content'])
