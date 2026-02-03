@@ -36,6 +36,11 @@ class Server:
         d['connected'] = connected
         ws_send_data(d)
 
+    def _close(self) -> None:
+        if self._conn:
+            self._conn.close()
+            self._conn = None
+
     def serve_forever(self) -> None:
         try:
             self._socket.bind(('0.0.0.0', 8989))
@@ -51,46 +56,49 @@ class Server:
                 self._ws_send_data(False)
                 self._conn, addr = self._socket.accept()
                 self._ws_send_data(True)
+                self.receive()
             except (ConnectionError, TimeoutError):
                 continue
-            self.receive()
+            finally:
+                self._close()
 
     def serve_stop(self) -> None:
         self._exit = True
         with contextlib.suppress(OSError):
             self._socket.shutdown(socket.SHUT_RDWR)
-        self._socket.close()
+        self._close()
 
     def receive(self) -> None:
         data: bytes = bytes()
         while True:
-            if self._exit:
+            if self._exit or not self._conn:
                 break
             try:
-                recv: bytes = self._conn.recv(64)
                 self._conn.settimeout(30.0)
+                recv: bytes = self._conn.recv(64)
                 if not recv:
                     break
+                data += recv
+                if len(data) >= 259:
+                    try:
+                        s: tuple = unpack('!256sbBB', data[:259])
+                        track: str = s[0].decode().rstrip('\0')
+                        status: int = s[1]
+                        # volume: int = s[2]
+                        # muted: bool = s[3]
+                        self._ws_send_data(data={'track': track, 'status': status})
+                    except UnicodeDecodeError:
+                        pass
+                    finally:
+                        self.send(pack("!B", Command.PING.value))
+                        data = data[259:]
+                        continue
             except (ConnectionError, TimeoutError):
                 break
-            data += recv
-            if len(data) >= 259:
-                try:
-                    s: tuple = unpack('!256sbBB', data[:259])
-                    track: str = s[0].decode().rstrip('\0')
-                    status: int = s[1]
-                    # volume: int = s[2]
-                    # muted: bool = s[3]
-                    self._ws_send_data(data={'track': track, 'status': status})
-                except UnicodeDecodeError:
-                    pass
-                finally:
-                    self.send(pack("!B", Command.PING.value))
-                    data = data[259:]
-                    continue
 
     def send(self, data: bytes) -> None:
         if self._conn:
-            with contextlib.suppress(BrokenPipeError):
+            try:
                 self._conn.send(data)
-
+            except (ConnectionError, OSError, BrokenPipeError):
+                self._close()
