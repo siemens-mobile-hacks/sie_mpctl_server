@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+import logging
 
 def main():
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='[%(asctime)s]%(message)s')
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sie_mpctl.settings')
     try:

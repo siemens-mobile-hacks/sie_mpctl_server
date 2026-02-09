@@ -1,10 +1,12 @@
 import socket
+import logging
 import contextlib
 from enum import Enum
 from typing import Optional
 from struct import pack, unpack
 from core.ws_actions import ws_send_data
 
+logger: logging.Logger = logging.getLogger(__name__)
 
 class Command(Enum):
     PLAYER_PREV = 0x02
@@ -40,12 +42,14 @@ class Server:
         if self._conn:
             self._conn.close()
             self._conn = None
+            logger.debug('Connection is closed')
 
     def serve_forever(self) -> None:
         try:
             self._socket.bind(('0.0.0.0', 8989))
         except OSError:
             return
+        logger.debug('Listening...')
         self._socket.listen(1)
         self._socket.settimeout(30.0)
         while True:
@@ -55,6 +59,7 @@ class Server:
             try:
                 self._ws_send_data(False)
                 self._conn, addr = self._socket.accept()
+                logger.debug(f'Accepted connection from {addr[0]}')
                 self._ws_send_data(True)
                 self.receive()
             except (ConnectionError, TimeoutError):
@@ -67,6 +72,7 @@ class Server:
         with contextlib.suppress(OSError):
             self._socket.shutdown(socket.SHUT_RDWR)
         self._close()
+        logger.info('Server is stopped')
 
     def receive(self) -> None:
         data: bytes = bytes()
@@ -100,5 +106,6 @@ class Server:
         if self._conn:
             try:
                 self._conn.send(data)
+                logger.debug(f'Sent {len(data)} bytes')
             except (ConnectionError, OSError, BrokenPipeError):
                 self._close()
